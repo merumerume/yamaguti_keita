@@ -1,0 +1,16 @@
+<!-- templates/registration/login.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ログイン</title>
+</head>
+<body>
+    <h1>ログイン</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">ログイン</button>
+    </form>
+    <p>アカウントをお持ちでない場合は、<a href="{% url 'register' %}">こちらで登録</a></p>
+</body>
+</html>

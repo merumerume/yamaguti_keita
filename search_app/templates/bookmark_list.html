@@ -1,0 +1,24 @@
+<h1>Your Bookmarks</h1>
+
+<form method="POST" action="{% url 'add_bookmark' %}">
+  {% csrf_token %}
+  <input type="url" name="url" placeholder="URL" required />
+  <input type="text" name="title" placeholder="Title" required />
+  <button type="submit">Add Bookmark</button>
+</form>
+
+<ul>
+  {% for bookmark in bookmarks %}
+  <li>
+    <a href="{{ bookmark.url }}">{{ bookmark.title }}</a>
+    <form
+      method="POST"
+      action="{% url 'remove_bookmark' bookmark.id %}"
+      style="display: inline"
+    >
+      {% csrf_token %}
+      <button type="submit">Remove</button>
+    </form>
+  </li>
+  {% endfor %}
+</ul>

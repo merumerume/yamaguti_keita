@@ -11,16 +11,3 @@ class Migration(migrations.Migration):
         ('search_app', '0002_category_alter_product_id_alter_product_name_and_more'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
-
-    operations = [
-        migrations.CreateModel(
-            name='Bookmark',
-            fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('url', models.URLField()),
-                ('title', models.CharField(max_length=100)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-            ],
-        ),
-    ]

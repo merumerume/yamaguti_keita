@@ -1,11 +1,12 @@
 from django.urls import path
 from . import views
 from django.contrib.auth import views as auth_views
+from django.conf.urls.static import static
+from django.conf import settings
 urlpatterns = [
     # ログインページ
-    path('login/', auth_views.LoginView.as_view(), name='login'),
-    # ログアウトページ
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(template_name='register.html'), name='logout'), 
     path('register/', views.register, name='register'),  
     # アカウント登録ページ
     path('', views.search_view, name='home'),
@@ -15,8 +16,6 @@ urlpatterns = [
     path('product/<int:pk>/edit/', views.product_update, name='product_update'),
     path('product/<int:pk>/delete', views.product_delete, name='product_delete'),
     path('product/', views.product_list, name='product_list'),  
-    path('bookmarks/', views.bookmark_list, name='bookmark_list'),
-    path('add-bookmark/', views.add_bookmark, name='add_bookmark'),
-    path('remove-bookmark/<int:bookmark_id>/', views.remove_bookmark, name='remove_bookmark'),
 
   ]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

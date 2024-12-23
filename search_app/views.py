@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Product,  Category, Bookmark# P モデルをインポート 
+from .models import Product,  Category# P モデルをインポート 
 from .forms import ProductForm, SearchForm # フォームのインポート
 from django.contrib.auth.forms import UserCreationForm  # 正しいインポート
 from django.core.paginator import Paginator
@@ -7,6 +7,7 @@ from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponseNotAllowed
+from .forms import SignUpForm
 #ここで終わり
 
 
@@ -90,44 +91,6 @@ def search_view(request):
 
 #追加した関数
 @login_required
-def add_bookmark(request):
-    if request.method == 'POST':
-        url = request.POST.get('url')
-        title = request.POST.get('title')
-        
-        # URLまたはタイトルが空の場合のエラーメッセージ
-        if not url or not title:
-            messages.error(request, 'URLとタイトルは必須です')
-            return redirect('bookmark_list')
-        
-        bookmark, created = Bookmark.objects.get_or_create(
-            user=request.user,
-            url=url,
-            defaults={'title': title}
-        )
-        
-        if created:
-            messages.success(request, 'ブックマークを追加しました')
-        else:
-            messages.info(request, 'すでにブックマークされています')
-        return redirect('bookmark_list')
-        
-        
-        if request.method != 'POST':
-            return HttpResponseNotAllowed(['POST'])
-    
-        url = request.POST.get('url')
-        title = request.POST.get('title')
-def bookmark_list(request):
-    bookmarks = Bookmark.objects.filter(user=request.user)
-    return render(request, 'bookmark_list.html', {'bookmarks': bookmarks})
-def remove_bookmark(request, bookmark_id):
-    bookmark = get_object_or_404(Bookmark, id=bookmark_id, user=request.user)
-    bookmark.delete()
-    messages.success(request, 'ブックマークを削除しました')
-    return redirect('bookmark_list')
-
-@login_required
 def home(request):
     return render(request, 'search.html')
 
@@ -135,9 +98,19 @@ def register(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)  # 登録後に自動的にログイン
-        return redirect('home')
+            user = form.save()  # 新しいユーザーを作成
+            login(request, user)  # 作成したユーザーで自動的にログイン
+        return redirect('home')  # ログイン後にホーム画面へリダイレクト
     else:
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
+
+def product_create(request):
+    if request.method == 'POST':
+        form = ProductForm(request.POST, request.FILES)  # 画像を受け取る
+        if form.is_valid():
+            form.save()
+            return redirect('product_list')
+    else:
+        form = ProductForm()
+    return render(request, 'product_form.html', {'form': form})

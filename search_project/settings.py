@@ -135,3 +135,7 @@ LOGIN_REDIRECT_URL = '/'
 # settings.py
 LOGIN_URL = '/login/'  # ログインしていない場合のリダイレクトURL
 LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = '/' 
+
+MEDIA_URL = '/media/'  # メディアファイルのURLパス
+MEDIA_ROOT = BASE_DIR / 'media'  # メディアファイルの保存場所

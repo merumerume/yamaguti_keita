@@ -1,5 +1,13 @@
 <form method="get">
-  {{ form.as_p }}
+  {{ form.as_p }} {% if user.is_authenticated %}
+  <form action="{% url 'logout' %}" method="post">
+    {% csrf_token %}
+    <button type="submit">ログアウト</button>
+  </form>
+
+  {% else %}
+  <a href="{% url 'login' %}">ログイン</a>
+  {% endif %}
   <label for="category">カテゴリ:</label>
   <select name="category">
     <option value="">すべて</option>
@@ -22,6 +30,22 @@
 </form>
 <ul>
   {% for product in page_obj %}
+  <li>
+    {% if product.image %}
+    <img
+      src="{{ product.image.url }}"
+      alt="{{ product.name }}"
+      style="max-width: 100px; height: auto"
+    />
+    {% else %}
+    <img
+      src="/static/images/default.jpg"
+      alt="No Image"
+      style="max-width: 100px; height: auto"
+    />
+    {% endif %}
+  </li>
+
   <li>{{ product.name }} - {{ product.price }}</li>
   {% empty %}
   <li>No results found</li>
@@ -34,7 +58,8 @@
     <a href="?page={{ page_obj.previous_page_number }}">前へ</a>
     {% endif %}
     <span>
-      ページ {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      ページ {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span
+    >
     {% if page_obj.has_next %}
     <a href="?page={{ page_obj.next_page_number }}">次へ</a>
     <a href="?page={{ page_obj.paginator.num_pages }}">最後</a>

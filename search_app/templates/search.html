@@ -1,13 +1,18 @@
 <form method="get">
-  {{ form.as_p }} {% if user.is_authenticated %}
+  {{ form.as_p }}
+</form>
+
+<!-- ログイン/ログアウトの処理 -->
+{% if user.is_authenticated %}
+  <!-- ログアウト用フォーム -->
   <form action="{% url 'logout' %}" method="post">
     {% csrf_token %}
     <button type="submit">ログアウト</button>
   </form>
-
-  {% else %}
+{% else %}
+  <!-- ログイン用リンク -->
   <a href="{% url 'login' %}">ログイン</a>
-  {% endif %}
+{% endif %}
   <label for="category">カテゴリ:</label>
   <select name="category">
     <option value="">すべて</option>
@@ -27,6 +32,10 @@
   </select>
   <!-- フォームを表示 -->
   <button type="submit">検索</button>
+  <!--カートを表示 -->
+  <a href="{% url 'cart_detail' %}" style="float: right; margin: 10px; text-decoration: none; color: white; background-color: blue; padding: 10px 20px; border-radius: 5px;">
+    カートを見る
+</a>
 </form>
 <ul>
   {% for product in page_obj %}

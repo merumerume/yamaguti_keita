@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Product,  Category# P モデルをインポート 
+from .models import Product,  Category, Cart, CartItem# P モデルをインポート 
 from .forms import ProductForm, SearchForm # フォームのインポート
 from django.contrib.auth.forms import UserCreationForm  # 正しいインポート
 from django.core.paginator import Paginator
@@ -8,6 +8,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import HttpResponseNotAllowed
 from .forms import SignUpForm
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
 #ここで終わり
 
 
@@ -105,6 +108,17 @@ def register(request):
         form = UserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
 
+def cart_view(request):
+    # ログイン済みのユーザーのカートを取得または作成
+    cart, created = Cart.objects.get_or_create(user=request.user)
+    return render(request, 'cart.html', {'cart': cart})
+
+@login_required
+def logout_view(request):
+    logout(request)  # ユーザーをログアウト
+    return redirect('home')  # ログアウト後にホーム画面にリダイレクト
+
+
 def product_create(request):
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)  # 画像を受け取る
@@ -114,3 +128,45 @@ def product_create(request):
     else:
         form = ProductForm()
     return render(request, 'product_form.html', {'form': form})
+
+
+#カート機能
+
+# **新規追加: カートに商品を追加する**
+def add_to_cart(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    cart, created = Cart.objects.get_or_create(user=request.user)
+    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+    
+    # 最大数量を制限（例: 10個以上は追加できない）
+    if cart_item.quantity < 10:
+        cart_item.quantity += 1
+        cart_item.save()
+    else:
+        # 最大数を超えた場合の処理（メッセージを表示など）
+        messages.error(request, 'この商品の数量は最大10個までです。')
+    
+    return redirect('cart_detail')
+
+def remove_from_cart(request, item_id):
+    cart_item = get_object_or_404(CartItem, id=item_id)  # カートアイテムをIDで取得
+    cart_item.delete()  # カートアイテムを削除
+    return redirect('cart_detail')  # カートの詳細ページにリダイレクト
+
+
+# **新規追加: カートから商品を削除する**
+def remove_from_cart(request, item_id):
+    cart_item = get_object_or_404(CartItem, id=item_id)
+    cart_item.delete()
+    return redirect('cart_detail')
+
+# **新規追加: カートの詳細を表示する**
+def cart_detail(request):
+    cart = Cart.objects.filter(user=request.user).first()
+    if not cart:
+        return render(request, 'cart_empty.html')
+    
+    # カートの合計金額を計算
+    total_price = sum(item.product.price * item.quantity for item in cart.items.all())
+    
+    return render(request, 'cart_detail.html', {'cart': cart, 'total_price': total_price})

@@ -1,0 +1,15 @@
+{% if cart %}
+    <h2>カートの中身</h2>
+    <ul>
+        {% for item in cart.items.all %}
+            <li>
+                {{ item.product.name }} - {{ item.quantity }} x ¥{{ item.product.price }} = ¥{{ item.product.price * item.quantity }}
+                <a href="{% url 'remove_from_cart' item.id %}">削除</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <h3>合計金額: ¥{{ total_price }}</h3>
+    <a href="{% url 'checkout' %}">チェックアウト</a>
+{% else %}
+    <p>カートは空です。</p>
+{% endif %}

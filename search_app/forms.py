@@ -1,5 +1,5 @@
 from django import forms
-from .models import Product
+from .models import Product,Review
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 
@@ -22,4 +22,11 @@ class SignUpForm(UserCreationForm):
         model = User
         fields = ('username', 'email', 'password1', 'password2')
 
-
+class ReviewForm(forms.ModelForm):
+    class Meta:
+        model = Review
+        fields = ['rating', 'comment']
+        labels = {
+            'rating': '評価 (1〜5)',
+            'comment': 'コメント',
+        }

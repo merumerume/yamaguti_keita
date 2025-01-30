@@ -1,0 +1,9 @@
+<h1>レビューを追加</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">投稿</button>
+</form>
+
+<a href="{% url 'product_detail' product.id %}">戻る</a>

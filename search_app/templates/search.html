@@ -1,77 +1,98 @@
-<form method="get">
-  {{ form.as_p }}
-</form>
-
-<!-- ログイン/ログアウトの処理 -->
-{% if user.is_authenticated %}
-  <!-- ログアウト用フォーム -->
-  <form action="{% url 'logout' %}" method="post">
-    {% csrf_token %}
-    <button type="submit">ログアウト</button>
-  </form>
-{% else %}
-  <!-- ログイン用リンク -->
-  <a href="{% url 'login' %}">ログイン</a>
-{% endif %}
-  <label for="category">カテゴリ:</label>
-  <select name="category">
-    <option value="">すべて</option>
-    <option value="書籍">本</option>
-    <option value="電子機器">電子機器</option>
-  </select>
-  <label for="min_price">最低価格:</label>
-  <input type="number" name="min_price" min="0" />
-  <label for="max_price">最高価格:</label>
-  <input type="number" name="max_price" min="0" />
-  <!-- 並び替えの選択 -->
-  <label for="sort">並び替え:</label>
-  <select name="sort">
-    <option value="name">名前順</option>
-    <option value="price_asc">価格が安い順</option>
-    <option value="price_desc">価格が高い順</option>
-  </select>
-  <!-- フォームを表示 -->
-  <button type="submit">検索</button>
-  <!--カートを表示 -->
-  <a href="{% url 'cart_detail' %}" style="float: right; margin: 10px; text-decoration: none; color: white; background-color: blue; padding: 10px 20px; border-radius: 5px;">
+{% load humanize %}
+<div class="container" style="max-width: 800px; margin: 0 auto; padding: 20px; position: relative;">
+  <!-- カートボタン -->
+  <a href="{% url 'cart_detail' %}" style="position: absolute; top: 20px; right: 20px; text-decoration: none; color: white; background-color: blue; padding: 10px 20px; border-radius: 5px;">
     カートを見る
-</a>
-</form>
-<ul>
-  {% for product in page_obj %}
-  <li>
-    {% if product.image %}
-    <img
-      src="{{ product.image.url }}"
-      alt="{{ product.name }}"
-      style="max-width: 100px; height: auto"
-    />
-    {% else %}
-    <img
-      src="/static/images/default.jpg"
-      alt="No Image"
-      style="max-width: 100px; height: auto"
-    />
-    {% endif %}
-  </li>
+  </a>
 
-  <li>{{ product.name }} - {{ product.price }}</li>
-  {% empty %}
-  <li>No results found</li>
-  {% endfor %}
-</ul>
-<div class="pagination">
-  <span class="step-links">
-    {% if page_obj.has_previous %}
-    <a href="?page=1">最初</a>
-    <a href="?page={{ page_obj.previous_page_number }}">前へ</a>
+  <h1 style="text-align: center; margin-bottom: 20px;">商品検索</h1>
+
+  <form method="get" style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+    {{ form.as_p }}
+
+    <label for="category" style="flex: 1; min-width: 150px;">
+      カテゴリ:
+      <select name="category" style="width: 100%;">
+        <option value="">すべて</option>
+        <option value="書籍">本</option>
+        <option value="電子機器">電子機器</option>
+      </select>
+    </label>
+
+    <label for="min_price" style="flex: 1; min-width: 150px;">
+      最低価格:
+      <input type="number" name="min_price" min="0" style="width: 100%;" />
+    </label>
+
+    <label for="max_price" style="flex: 1; min-width: 150px;">
+      最高価格:
+      <input type="number" name="max_price" min="0" style="width: 100%;" />
+    </label>
+
+    <label for="sort" style="flex: 1; min-width: 150px;">
+      並び替え:
+      <select name="sort" style="width: 100%;">
+        <option value="name">名前順</option>
+        <option value="price_asc">価格が安い順</option>
+        <option value="price_desc">価格が高い順</option>
+      </select>
+    </label>
+
+    <button type="submit" style="background-color: green; color: white; padding: 10px 20px; border: none; border-radius: 5px; flex-basis: 100px;">
+      検索
+    </button>
+  </form>
+
+  <!-- ログイン/ログアウトリンク -->
+  <div style="margin-bottom: 20px; text-align: right;">
+    {% if user.is_authenticated %}
+      <form action="{% url 'logout' %}" method="post" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" style="background: none; border: none; color: red; cursor: pointer;">ログアウト</button>
+      </form>
+    {% else %}
+      <a href="{% url 'login' %}" style="text-decoration: none; color: blue;">ログイン</a>
     {% endif %}
-    <span>
-      ページ {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span
-    >
-    {% if page_obj.has_next %}
-    <a href="?page={{ page_obj.next_page_number }}">次へ</a>
-    <a href="?page={{ page_obj.paginator.num_pages }}">最後</a>
-    {% endif %}
-  </span>
+  </div>
+
+  <!-- 検索結果 -->
+  <ul style="list-style: none; padding: 0;">
+    {% for product in page_obj %}
+    <li style="display: flex; align-items: center; margin-bottom: 20px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+      <!-- 商品画像 -->
+      <div style="flex-shrink: 0; margin-right: 10px;">
+        {% if product.image %}
+        <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 100px; height: auto; border-radius: 5px;" />
+        {% else %}
+        <img src="/static/images/default.jpg" alt="No Image" style="width: 100px; height: auto; border-radius: 5px;" />
+        {% endif %}
+      </div>
+
+      <!-- 商品情報 -->
+      <div>
+        <a href="{% url 'product_detail' product.id %}" style="text-decoration: none; font-size: 1.2em; color: black;">
+          <strong>{{ product.name }}</strong>
+        </a>
+        <p style="margin: 5px 0;">価格: {{ product.price|floatformat:-2|intcomma }} 円</p>
+      </div>
+    </li>
+    {% empty %}
+    <li style="text-align: center; color: red;">該当する商品が見つかりませんでした。</li>
+    {% endfor %}
+  </ul>
+
+  <!-- ページネーション -->
+  <div class="pagination" style="text-align: center; margin-top: 20px;">
+    <span class="step-links">
+      {% if page_obj.has_previous %}
+      <a href="?page=1" style="margin-right: 10px;">最初</a>
+      <a href="?page={{ page_obj.previous_page_number }}" style="margin-right: 10px;">前へ</a>
+      {% endif %}
+      <span>ページ {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+      {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}" style="margin-left: 10px;">次へ</a>
+      <a href="?page={{ page_obj.paginator.num_pages }}" style="margin-left: 10px;">最後</a>
+      {% endif %}
+    </span>
+  </div>
 </div>

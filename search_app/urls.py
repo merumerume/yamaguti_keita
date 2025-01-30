@@ -3,6 +3,7 @@ from . import views
 from django.contrib.auth import views as auth_views
 from django.conf.urls.static import static
 from django.conf import settings
+from .views import delete_review,review_page
 urlpatterns = [
     # ログインページ
     path('login/', auth_views.LoginView.as_view(template_name='registration/login.html'), name='login'),
@@ -20,6 +21,10 @@ urlpatterns = [
     path('cart/', views.cart_detail, name='cart_detail'),
     path('cart/add/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
     path('cart/remove/<int:item_id>/', views.remove_from_cart, name='remove_from_cart'),
+    #レビュー
+    path('product/<int:product_id>/add_review/', views.add_review, name='add_review'),
+    path('review/delete/<int:review_id>/', delete_review, name='delete_review'),
+    path('product/<int:product_id>/reviews/', review_page, name='review_page'),
+]
 
-  ]
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
